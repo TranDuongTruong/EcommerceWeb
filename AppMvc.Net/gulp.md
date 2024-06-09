@@ -1,0 +1,1 @@
+ dotnet aspnet-codegenerator controller -name DiscountController -namespace AppMvc.Net.Areas.Discount.Controllers  -udl -dc AppMvc.Net.Models.AppDbContext -outDir Areas/Discount/Controllers -m AppMvc.Net.Models.Discount.DiscountModel

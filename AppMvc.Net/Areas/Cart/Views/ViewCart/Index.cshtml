@@ -1,0 +1,490 @@
+@model AppMvc.Net.Models.Cart.CartModel
+
+@{
+    ViewData["Title"] = "My Cart";
+    var items = Model.CartItems;
+    var shopName = ViewBag.shopName as List<String>;
+    var cartService = ViewBag.cartService as CartService;
+    var listDiscount = ViewBag.listDiscount as Dictionary<string, string>;
+}
+<h1>My Cart</h1>
+<form asp-action="CreateOrder" method="post">
+    @{
+
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>
+                        <input type="checkbox" id="select-all" />
+                    </th>
+
+                    <th>Product</th>
+                    <th>Unit price</th>
+                    <th>Quantity</th>
+                    <th> Amount of money</th>
+
+                    <th>Operation</th>
+                </tr>
+            </thead>
+            <tbody>
+
+
+                @for (int i = 0; i < items.Count; i++)
+                {
+                    <tr>
+                        @if (i == 0)
+                        {
+                            <td>@shopName[i]</td>
+                        }
+                    </tr>
+                    var photo = "";
+                    if (items[i].Product.Photos != null)
+                    {
+                        photo = (File.Exists($"/contents/Products/{items[i].Product.Photos[0].FileName}")) ?
+                        ("Products/" + items[i].Product.Photos.FirstOrDefault().FileName) : "icon.jpg";
+                    }
+                    else
+                    {
+                        photo = "icon.jpg";
+                    }
+                    var srcImg = $"/contents/{photo}";
+
+                    <tr>
+                        <td>
+                            <input type="checkbox" name="selectedItems" value="@items[i].Id" class="item-checkbox"
+                                data-price="@items[i].Product.Prices" data-quantity="@items[i].Quantity"
+                                data-cartItemId="@items[i].Id" />
+                        </td>
+                        <td>
+                            <img src="@srcImg" alt="Product Image" width="50" height="50" />
+                            @items[i].Product.Title
+                        </td>
+                        <td>@items[i].Product.Prices.ToString("n3")</td>
+                        <td>
+
+                            <div class="quantity-controls">
+                                <form asp-action="DecreaseQuantity" method="post" class="form-inline">
+                                    <input type="hidden" name="cartItemId" value="@items[i].Id" />
+                                    <button type="submit" class="quantity-button">-</button>
+                                </form>
+                                <span class="quantity-display">@items[i].Quantity</span>
+                                <form asp-action="IncreaseQuantity" method="post" class="form-inline">
+                                    <input type="hidden" name="cartItemId" value="@items[i].Id" />
+                                    <button type="submit" class="quantity-button">+</button>
+                                </form>
+                            </div>
+
+                        </td>
+                        <td>@((items[i].Quantity * items[i].Product.Prices).ToString("n3"))</td>
+                        <td>
+                            <form asp-action="RemoveItem" method="post">
+                                <input type="hidden" name="cartItemId" value="@items[i].Id" />
+                                <button type="submit" class="btn btn-danger">Remove</button>
+                            </form>
+                        </td>
+                    </tr>
+                    <tr>
+                        @if (i < items.Count - 1)
+                        {
+
+                            if (items[i].Product.AuthorId != items[i + 1].Product.AuthorId)
+                            {
+
+                                if (i == 0)
+                                {
+                                    <td id="add-voucher-button" onclick="toggleVoucherModal('@items[i].Product.AuthorId', 'Seller')">
+                                        Thêm mã giảm giá của shop
+                                    </td>
+                                }
+                                else
+                                {
+                                    <td id="add-voucher-button" onclick="toggleVoucherModal('@items[i-1].Product.AuthorId', 'Seller')">
+                                        Thêm mã giảm giá của shop
+                                    </td>
+                                }
+
+                            }
+                        }
+                        @if (i == items.Count - 1)
+                        {
+                            <td id="add-voucher-button" onclick="toggleVoucherModal('@items[i].Product.AuthorId', 'Seller')">
+                                Thêm mã giảm giá của shop
+                            </td>
+                        }
+
+
+                    </tr>
+                    <tr>
+                        @if (i < items.Count - 1)
+                        {
+                            if (items[i].Product.AuthorId != items[i + 1].Product.AuthorId)
+                            {
+
+                                <td>@shopName[i + 1]</td>
+
+
+                                <hr />
+                                <hr />
+                            }
+                        }
+                    </tr>
+                }
+            </tbody>
+            <tr>
+                <td colspan="4" class="text-right">Total</td>
+
+                @* <td id="total-price">@(Model.CartItems.Sum(ci => ci.Quantity * ci.Product.Prices).ToString("n3"))</td> *@
+                <td>
+                    <span id="total-price" style="text-decoration: ">
+                        @(Model.CartItems.Sum(ci => ci.Quantity * ci.Product.Prices).ToString("n3"))
+                    </span>
+                    <br />
+                    <span id="discounted-price" style="color: red;">
+
+                    </span>
+                </td>
+                <td id="add-voucher-button" onclick="toggleVoucherModal('000', 'System')">
+                    Thêm mã giảm giá của hệ thống
+                </td>
+            </tr>
+
+        </table>
+    }
+
+</form>
+<form>
+    <a class="btn btn-primary" onclick="Checkout()">Checkout </a>
+
+</form>
+
+
+
+
+
+<div id="voucher-modal">
+    <div id="voucher-modal-content">
+        <h2>Chọn mã giảm giá</h2>
+        <div class="form-group d-flex justify-content-between">
+            <input type="text" id="voucher-code" class="form-control" placeholder="Nhập mã voucher">
+            <button id="apply-voucher-button" class="btn btn-primary">ÁP DỤNG</button>
+        </div>
+        <ul id="discount-list">
+            <!-- Các item mã giảm giá sẽ được chèn vào đây -->
+        </ul>
+        <div id="modal-footer">
+            <button class="modal-button" onclick="applyDiscount()">OK</button>
+        </div>
+    </div>
+</div>
+
+
+<script>
+    document.getElementById('select-all').addEventListener('change', function () {
+        var checkboxes = document.querySelectorAll('.item-checkbox');
+        for (var checkbox of checkboxes) {
+            checkbox.checked = this.checked;
+        }
+        updateTotal();
+    });
+
+
+
+    document.querySelectorAll('.item-checkbox').forEach(checkbox => {
+        checkbox.addEventListener('change', function () {
+            console.log("aaaaaaaaa")
+            var allChecked = true;
+            document.querySelectorAll('.item-checkbox').forEach(c => {
+                if (!c.checked) {
+                    allChecked = false;
+                }
+            });
+            document.getElementById('select-all').checked = allChecked;
+            //   document.getElementById('select-all-footer').checked = allChecked;
+            updateTotal();
+        });
+    });
+
+    function submitForm(input) {
+        input.form.submit();
+    }
+
+    function updateTotal() {
+        var total = 0;
+        var selectedItems = [];
+
+        document.querySelectorAll('.item-checkbox:checked').forEach(checkbox => {
+            var price = parseFloat(checkbox.getAttribute('data-price'));
+            var quantity = parseInt(checkbox.getAttribute('data-quantity'));
+            var cartItemId = parseInt(checkbox.getAttribute('data-cartItemId'));
+            console.log(price, quantity, cartItemId)
+            if (!isNaN(price) && !isNaN(quantity)) {
+                total += price * quantity;
+                selectedItems.push({ id: checkbox.value, quantity: quantity, cartItemId: cartItemId });
+            }
+        });
+
+        if (!isNaN(total)) {
+            document.getElementById('total-price').innerText = total.toFixed(3);
+            localStorage.setItem('selectedItems', JSON.stringify(selectedItems));
+
+            // Lấy giá trị giảm giá từ localStorage và tính toán lại giá giảm giá
+            var systemDiscountDetails = JSON.parse(localStorage.getItem('systemDiscountDetails'));
+            var shopDiscountDetails = JSON.parse(localStorage.getItem('shopDiscountDetails'));
+
+            var newPrice = total;
+            if (systemDiscountDetails) {
+                newPrice = applyDiscountToTotal(newPrice, systemDiscountDetails);
+            }
+            if (shopDiscountDetails) {
+                newPrice = applyDiscountToTotal(newPrice, shopDiscountDetails);
+            }
+
+            if (systemDiscountDetails || shopDiscountDetails) {
+                document.getElementById('discounted-price').innerText = newPrice.toFixed(3);
+                document.getElementById('total-price').style.textDecoration = 'line-through';
+            } else {
+                document.getElementById('discounted-price').innerText = "";
+                document.getElementById('total-price').style.textDecoration = 'none';
+            }
+        } else {
+            document.getElementById('total-price').innerText = "0.000";
+            document.getElementById('discounted-price').innerText = "";
+            document.getElementById('total-price').style.textDecoration = 'none';
+        }
+    }
+
+    function applyDiscountToTotal(total, discountDetails) {
+        if (discountDetails.type === 2) {
+            return (total - discountDetails.amount) > 0 ? (total - discountDetails.amount) : 0;
+        } else if (discountDetails.type === 1) {
+            return (total - (total * (discountDetails.percentage / 100))) > 0 ? (total - (total * (discountDetails.percentage / 100))) : 0;
+        }
+        return total;
+    }
+
+    window.addEventListener('DOMContentLoaded', function () {
+        // Check if selected items are stored in local storage
+        var storedItems = localStorage.getItem('selectedItems');
+        if (storedItems) {
+            var selectedItems = JSON.parse(storedItems);
+            // Check the checkboxes for stored selected items
+            selectedItems.forEach(item => {
+                var checkbox = document.querySelector('.item-checkbox[value="' + item.id + '"]');
+                if (checkbox) {
+                    checkbox.checked = true;
+                    // Update quantity input for selected item
+                    var quantityInput = document.querySelector('.quantity-input[data-id="' + item.id + '"]');
+                    if (quantityInput) {
+                        quantityInput.value = item.quantity;
+                    }
+                }
+            });
+        }
+
+        // Check if discount details are stored in local storage
+        var systemDiscountDetails = JSON.parse(localStorage.getItem('systemDiscountDetails'));
+        var shopDiscountDetails = JSON.parse(localStorage.getItem('shopDiscountDetails'));
+
+        var total = parseFloat(document.getElementById('total-price').innerText);
+        var newPrice = total;
+
+        if (systemDiscountDetails) {
+            newPrice = applyDiscountToTotal(newPrice, systemDiscountDetails);
+        }
+        if (shopDiscountDetails) {
+            newPrice = applyDiscountToTotal(newPrice, shopDiscountDetails);
+        }
+
+        if (systemDiscountDetails || shopDiscountDetails) {
+            document.getElementById('discounted-price').innerText = newPrice.toFixed(3);
+            document.getElementById('total-price').style.textDecoration = 'line-through';
+        }
+
+        // Update total based on stored selected items
+        updateTotal();
+    });
+
+    function toggleVoucherModal(authorId, discountAuthorType) {
+        var modal = document.getElementById("voucher-modal");
+        console.log("aa:", (`/ViewCartController/GetDiscounts/${authorId}/${discountAuthorType}`));
+        if (modal.style.display === "block") {
+            modal.style.display = "none";
+        } else {
+            // Make an AJAX call to get the discounts
+            fetch(`/ViewCartController/GetDiscounts/${authorId}/${discountAuthorType}`)
+                .then(response => response.json())
+                .then(data => {
+                    console.log("aaaaaa", data);
+                    // Update the modal content with the discounts
+                    var discountList = document.getElementById("discount-list");
+                    discountList.innerHTML = ''; // Clear existing content
+                    var selectedDiscountCode;
+                    // Lấy mã giảm giá đã lưu trong local storage
+                    if (discountAuthorType == "Seller") selectedDiscountCode = localStorage.getItem('selectedShopDiscountCode');
+                    else selectedDiscountCode = localStorage.getItem('selectedSystemDiscountCode');
+                    for (var key in data) {
+                        if (data.hasOwnProperty(key)) {
+                            var listItem = document.createElement("li");
+                            var label = document.createElement("label");
+                            var radio = document.createElement("input");
+                            radio.setAttribute("type", "radio");
+                            radio.setAttribute("name", "discount");
+                            radio.setAttribute("value", data[key]);
+                            radio.setAttribute("authorId", authorId);
+
+                            // Đánh dấu radio nếu nó đã được chọn trước đó
+                            if (selectedDiscountCode && data[key] === selectedDiscountCode) {
+                                radio.checked = true;
+                            }
+
+                            radio.addEventListener('click', function () {
+                                // Kiểm tra nếu đã được chọn và click vào nó thì bỏ tick
+                                if (this.checked && this.previousChecked) {
+                                    this.checked = false;
+                                    this.previousChecked = false;
+                                    if (discountAuthorType == "Seller") {
+                                        localStorage.removeItem('selectedShopDiscountCode');
+                                        localStorage.removeItem('shopDiscountDetails');
+                                    } else {
+                                        localStorage.removeItem('selectedSystemDiscountCode');
+                                        localStorage.removeItem('systemDiscountDetails');
+                                    }
+                                    var totalPriceElement = document.getElementById('total-price');
+                                    var discountedPriceElement = document.getElementById('discounted-price');
+                                    if (totalPriceElement && discountedPriceElement) {
+                                        totalPriceElement.style.textDecoration = 'none';
+                                        discountedPriceElement.innerText = '';
+                                    }
+                                    updateTotal();
+                                } else {
+                                    // Nếu không, lưu giá trị hiện tại là được chọn
+                                    document.querySelectorAll('input[name="discount"]').forEach(rb => {
+                                        rb.previousChecked = false;
+                                    });
+                                    this.previousChecked = true;
+                                    if (discountAuthorType == "Seller") localStorage.setItem('selectedShopDiscountCode', this.value);
+                                    else localStorage.setItem('selectedSystemDiscountCode', this.value);
+                                }
+                            });
+
+                            label.appendChild(radio);
+                            label.appendChild(document.createTextNode(key));
+                            listItem.appendChild(label);
+                            discountList.appendChild(listItem);
+                        }
+                    }
+
+                    // Show the modal
+                    modal.style.display = "block";
+                })
+                .catch(error => console.error('Error fetching discounts:', error));
+        }
+    }
+
+    window.onclick = function (event) {
+        var modal = document.getElementById("voucher-modal");
+        if (event.target === modal) {
+            modal.style.display = "none";
+        }
+    }
+
+    function applyDiscount() {
+
+        var authorId = [];
+        var price = parseFloat(document.getElementById('total-price').innerText);
+
+        // Lặp qua tất cả các checkbox discount để lấy những mã giảm giá được chọn
+        var discountCode = [];
+        document.querySelectorAll('input[name="discount"]:checked').forEach(checkbox => {
+            discountCode.push(checkbox.value);
+            authorId.push(checkbox.getAttribute("authorId"));
+        });
+        if (!authorId[0] || !discountCode[0]) {
+            return;
+        }
+        console.log(`/ViewCartController/ApplyDiscount/${discountCode[0]}/${authorId[0]}/${price}`);
+        fetch(`/ViewCartController/ApplyDiscount/${discountCode[0]}/${authorId[0]}/${price}`).then(response => response.json())
+            .then(data => {
+                console.log(`/ViewCartController/ApplyDiscount/${discountCode[0]}/${authorId[0]}/${price}`);
+                console.log(data.newPrice);
+                if (data.success) {
+                    // Cập nhật giá thành công
+                    var discountDetails = {
+                        type: data.discountType,
+                        amount: data.amount,
+                        percentage: data.percentage
+                    };
+                    if (authorId[0] == "000") {
+                        localStorage.setItem('selectedSystemDiscountCode', discountCode[0]);
+                        localStorage.setItem('systemDiscountDetails', JSON.stringify(discountDetails));
+                    } else {
+                        localStorage.setItem('selectedShopDiscountCode', discountCode[0]);
+                        localStorage.setItem('shopDiscountDetails', JSON.stringify(discountDetails));
+                    }
+
+                    var totalPriceElement = document.getElementById('total-price');
+                    var discountedPriceElement = document.getElementById('discounted-price');
+                    if (totalPriceElement && discountedPriceElement) {
+                        totalPriceElement.style.textDecoration = 'line-through';
+                        discountedPriceElement.innerText = data.newPrice.toFixed(3);
+                    }
+
+                    // Đóng modal sau khi cập nhật thành công
+                    var modal = document.getElementById("voucher-modal");
+                    modal.style.display = "none";
+                    updateTotal();
+                } else {
+                    // Hiển thị thông báo lỗi nếu có
+                    console.log(`/ViewCartController/ApplyDiscount/${discountCode[0]}/${authorId[0]}/${price}`);
+                    alert("aaaaaaaaaaaaaa", data.message,);
+                }
+            })
+            .catch(error => console.error('Error applying discounts:', error));
+    }
+    function Checkout() {
+        var selectedItems = JSON.parse(localStorage.getItem('selectedItems'));
+
+        console.log(selectedItems)
+        var shopDiscountCode = localStorage.getItem('selectedShopDiscountCode');
+        var systemDiscountCode = localStorage.getItem('selectedSystemDiscountCode');
+
+        if (shopDiscountCode === null) shopDiscountCode = "null"
+        if (systemDiscountCode === null) systemDiscountCode = "null"
+
+        var url = ""
+        selectedItems.forEach(item => {
+            url += item.cartItemId + "_";
+        });
+
+        console.log("aaa" + (`/cart/checkout/${url}/${shopDiscountCode}/${systemDiscountCode}`));
+        //  alert("aaaaaa");
+        // Gửi yêu cầu POST với dữ liệu JSON
+        fetch(`/cart/checkout/${url}/${shopDiscountCode}/${systemDiscountCode}`)
+            .then(response => {
+                console.log(response);
+                // alert("aaa1111");
+                if (response.ok) {
+                    return response.json();
+                }
+                throw new Error('Có lỗi xảy ra khi gửi yêu cầu.');
+            })
+            .then(data => {
+                console.log(data);
+                //  alert("aaa");
+                localStorage.removeItem('selectedSystemDiscountCode');
+                localStorage.removeItem('systemDiscountDetails');
+                localStorage.removeItem('selectedShopDiscountCode');
+                localStorage.removeItem('shopDiscountDetails');
+                location.reload();
+                console.log("Dữ liệu đã nhận được.");
+
+                window.location.href = data.redirectUrl;
+
+            })
+            .catch(error => {
+                console.error('Lỗi:', error);
+                alert("Có lỗi xảy ra: " + error.message);
+            });
+
+    }
+</script>

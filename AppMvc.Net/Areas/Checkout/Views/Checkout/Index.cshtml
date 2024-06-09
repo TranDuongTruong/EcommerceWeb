@@ -1,0 +1,39 @@
+@model AppMvc.Net.Models.Cart.CheckoutViewModel
+
+
+@{
+    ViewData["Title"] = "My Cart";
+    var items = Model.CartItems;
+    
+    var shopNames = ViewBag.shopName as List<String>;
+    var listDiscount = ViewBag.listDiscount as Dictionary<string, string>;
+}
+
+<h1>Checkout</h1>
+
+<table>
+    <thead>
+        <tr>
+            <th>Product Name</th>
+            <th>Quantity</th>
+            <th>Price</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in items)
+        {
+            <tr>
+                <td>@item.Product.Title</td>
+                <td>@item.Quantity</td>
+                <td>@item.Product.Prices</td>
+            </tr>
+        }
+
+    </tbody>
+</table>
+
+<p>Total Price: @Model.TotalPrice</p>
+
+<form method="post" action="/Checkout/ProcessPayment">
+    <button type="submit">Proceed to Payment</button>
+</form>

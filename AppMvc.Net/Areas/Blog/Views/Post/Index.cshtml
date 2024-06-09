@@ -1,0 +1,108 @@
+@model IEnumerable<AppMvc.Net.Models.Blog.Post>
+@using AppMvc.Net.Menu
+@inject AdminSidebarService _AdminSidebarService
+@{
+    ViewData["Title"] = "Danh sách BLog"; Layout = "/Views/Shared/_LayoutAdmin.cshtml";
+
+}
+
+<h1>@ViewData["Title"]</h1>
+
+<partial name="_AlertMessage" />
+
+<p>
+    <a asp-action="Create">Tạo bài viết mới</a>
+</p>
+<p>Tổng số bài viết: @ViewBag.totalPosts</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>STT</th>
+            <th>
+                @Html.DisplayNameFor(model => model.Title)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Published)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Author)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.DateUpdated)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @(++ViewBag.postIndex)
+                </td>
+                <td>
+                    <a asp-action="Edit" asp-route-id="@item.PostId">
+                        @Html.DisplayFor(modelItem => item.Title)
+                    </a>
+                    <br>
+                    <small>
+                        @string.Join(", ", item.PostCategories.Select(pc => pc.Category.Title))
+                    </small>
+
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Published)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Author.UserName)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.DateUpdated)
+                </td>
+                <td>
+
+                    <a asp-action="Details" asp-route-id="@item.PostId">Chi tiết</a> |
+                    <a asp-action="Delete" asp-route-id="@item.PostId">Xóa</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<partial name="_PagingXTL" model="@ViewBag.pagingModel" />
+@{
+    async Task RenderCategory(Category item, int level)
+    {
+        string prefix = string.Concat(Enumerable.Repeat("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;", level));
+        <tr>
+            <td>
+                @Html.Raw(prefix)
+                <a asp-action="Edit" asp-route-id="@item.Id">
+                    @Html.DisplayFor(modelItem => item.Title)
+                </a>
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Slug)
+            </td>
+            <td>
+                <a asp-action="Details" asp-route-id="@item.Id">Chi tiết</a> |
+                <a asp-action="Delete" asp-route-id="@item.Id">Xóa</a>
+            </td>
+        </tr>
+        if (item.CategoryChildren?.Count > 0)
+        {
+            foreach (var cCategory in item.CategoryChildren)
+            {
+                await RenderCategory(cCategory, level + 1);
+            }
+        }
+    }
+}
+@{
+    _AdminSidebarService.SetActive("Post", "Index", "Blog");
+}
+
+@section Sidebar
+{
+    @Html.Raw(_AdminSidebarService.renderHtml())
+}

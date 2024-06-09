@@ -1,0 +1,152 @@
+@model AppMvc.Net.Areas.Discount.Models.CreateDiscountModel
+@{
+    ViewData["Title"] = "Create";
+    var listProducts = ViewData["products"] as MultiSelectList;
+
+    var listCategories = ViewData["categories"] as MultiSelectList;
+
+}
+
+<h1>Create</h1>
+
+<h4>DiscountModel</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Create">
+            <div class="form-group">
+                <label asp-for="Name" class="control-label"> Discount Name</label>
+                <input asp-for="Name" class="form-control" />
+                <span asp-validation-for="Name" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Description" class="control-label">Description</label>
+                <input asp-for="Description" class="form-control" />
+                <span asp-validation-for="Description" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Code" class="control-label">Code</label>
+                <input asp-for="Code" class="form-control" />
+                <span asp-validation-for="Code" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="MaxUsage" class="control-label">Max Usage</label>
+                <input asp-for="MaxUsage" class="form-control" />
+                <span asp-validation-for="MaxUsage" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="DiscountType" class="control-label">Discount Type</label>
+                <select asp-for="DiscountType" class="form-control" id="discountType"
+                    asp-items="Html.GetEnumSelectList<DiscountType>()">
+                </select>
+                <span asp-validation-for="DiscountType" class="text-danger"></span>
+            </div>
+
+            <div class="form-group" id="percentageField">
+                <label asp-for="Percentage" class="control-label">Percentage</label>
+                <input asp-for="Percentage" class="form-control" />
+                <span asp-validation-for="Percentage" class="text-danger"></span>
+            </div>
+
+            <div class="form-group" id="amountField">
+                <label asp-for="Amount" class="control-label">Amount</label>
+                <input asp-for="Amount" class="form-control" />
+                <span asp-validation-for="Amount" class="text-danger"></span>
+            </div>
+
+
+            <div class="form-group">
+                <label asp-for="StartDate" class="control-label"></label>
+                <input asp-for="StartDate" class="form-control" />
+                <span asp-validation-for="StartDate" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="EndDate" class="control-label"></label>
+                <input asp-for="EndDate" class="form-control" />
+                <span asp-validation-for="EndDate" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="ProductIDs" class="control-label"></label>
+                <select asp-for="ProductIDs" multiple="multiple" asp-items="listProducts" class="w-100"></select>
+                <span asp-validation-for="ProductIDs" class="text-danger"></span>
+            </div>
+
+
+            <div class="form-group">
+                <label asp-for="CategoryIDs" class="control-label"></label>
+                <select asp-for="CategoryIDs" multiple="multiple" asp-items="listCategories" class="w-100"></select>
+                <span asp-validation-for="CategoryIDs" class="text-danger"></span>
+            </div>
+
+
+            <div class="form-group">
+                <label asp-for="AuthorId" class="control-label"></label>
+                <select asp-for="AuthorId" class="form-control" asp-items="ViewBag.AuthorId"></select>
+                <span asp-validation-for="AuthorId" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <div class="checkbox">
+                    <span asp-validation-for="IsForAllProducts" class="text-danger"></span>
+                    <label>
+                        <input asp-for="IsForAllProducts" /> @Html.DisplayNameFor(model => model.IsForAllProducts)
+                    </label>
+                </div>
+
+            </div>
+
+            <div class="form-group">
+                <label asp-for="AuthorType" class="control-label"></label>
+                <select asp-for="AuthorType" class="form-control"
+                    asp-items="Html.GetEnumSelectList<DiscountAuthorType>()"></select>
+                <span asp-validation-for="AuthorType" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Create" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+
+@section Scripts {
+    <script src="~/lib/multiple-select/multiple-select.min.js"></script>
+    <link rel="stylesheet" href="~/lib/multiple-select/multiple-select.min.css" />
+
+    <script>
+        document.getElementById("discountType").addEventListener("change", function () {
+            var percentageField = document.getElementById("percentageField");
+            var amountField = document.getElementById("amountField");
+
+            if (this.value === "1") {
+                percentageField.style.display = "block";
+                amountField.style.display = "none";
+            } else if (this.value === "2") {
+                percentageField.style.display = "none";
+                amountField.style.display = "block";
+            }
+        });
+
+        // Set initial state based on the selected value
+        document.getElementById("discountType").dispatchEvent(new Event("change"));
+
+        $("#CategoryIDs").multipleSelect({
+            selectAll: false,
+            keepOpen: false,
+            isOpen: false,
+        });
+        $("#ProductIDs").multipleSelect({
+            selectAll: false,
+            keepOpen: false,
+            isOpen: false,
+        });
+
+    </script>
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+}

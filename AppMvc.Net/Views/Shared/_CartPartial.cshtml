@@ -1,0 +1,19 @@
+@using Microsoft.AspNetCore.Http
+@using Newtonsoft.Json
+
+@inject CartService _cartService;
+
+
+@{
+    var CartItems = await _cartService.GetCartItems();
+
+
+    {
+        <div class="nav-item">
+
+            <a class="nav-link text-warning" asp-area="Cart" asp-controller="ViewCart" asp-action="Index">
+                <i class="fas fa-shopping-cart"></i>
+                (@CartItems)</a>
+        </div>
+    }
+}
