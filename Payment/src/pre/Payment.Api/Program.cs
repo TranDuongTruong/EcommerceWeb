@@ -1,3 +1,7 @@
+using Payment.Api.Services;
+using Payment.Application.Features.Commands;
+using Payment.Application.Interface;
+using Payment.Persistence.Persist;
 using System.Reflection;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -24,6 +28,16 @@ builder.Services.AddSwaggerGen(options =>
     var path = Path.Combine(AppContext.BaseDirectory, xmlFileName);
     options.IncludeXmlComments(path);
 });
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddScoped<ISqlService, SqlService>();
+builder.Services.AddScoped<ICurrentUserService, CurrentUserService>();
+builder.Services.AddScoped<IConnectionService, ConnectionService>();
+builder.Services.AddMediatR(r =>
+{
+    r.RegisterServicesFromAssembly(typeof(CreateMerchant).Assembly);
+});
+
+
 
 var app = builder.Build();
 

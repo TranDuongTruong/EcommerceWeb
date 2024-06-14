@@ -25,6 +25,10 @@ body {
     /* Vertically center the text there */
 }
 
+.container {
+    padding-top: 10px;
+}
+
 @import "menu";
 @import "contact";
 @import "footer";
@@ -32,3 +36,4 @@ body {
 @import "product";
 @import "voucherModal";
 @import "cart";
+@import "newLayoutSite";

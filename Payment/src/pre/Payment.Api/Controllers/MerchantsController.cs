@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using MediatR;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Payment.Application.Base.Models;
 using Payment.Application.Features.Commands;
@@ -10,6 +11,13 @@ namespace Payment.Api.Controllers
     [ApiController]
     public class MerchantsController : ControllerBase
     {
+
+        private readonly IMediator mediator;
+
+        public MerchantsController(IMediator mediator)
+        {
+            this.mediator = mediator;
+        }
         /// <summary>
         /// Get merchants base on criteria
         /// </summary>
@@ -63,19 +71,20 @@ namespace Payment.Api.Controllers
         /// 
         ///     POST /merchants
         ///     {
-        ///         "MerchantName" : "Website bán hàng A",
-        ///         "MerchantWebLink" : "https://webbanhang.com",
-        ///         "MerchantIpnUrl" : "https://webbanhang.com/ipn",
-        ///         "MerchantReturnUrl" : "https://webbanhang.com/payment/return"
+        ///         "MerchtName" : "Website bán hàng A",
+        ///         "WebLink" : "https://webbanhang.com",
+        ///         "MerchtIpnUrl" : "https://webbanhang.com/ipn",
+        ///         "MerchtReturnUrl" : "https://webbanhang.com/payment/return"
         ///     }
         /// 
         /// </remarks>
         [HttpPost]
         [ProducesResponseType(typeof(BaseResultWithData<MerchantDtos>), 200)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
-        public IActionResult Create([FromBody] CreateMerchant request)
+        public async Task<IActionResult> Create([FromBody] CreateMerchant request)
         {
             var response = new BaseResultWithData<MerchantDtos>();
+            response=await  mediator.Send(request);
             return Ok(response);
         }
 

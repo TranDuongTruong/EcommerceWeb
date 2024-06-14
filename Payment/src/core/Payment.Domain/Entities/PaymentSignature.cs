@@ -24,9 +24,6 @@ namespace Payment.Domain.Entities
 
         // Foreign key
         public string? PaymtId { get; set; }
-      
-
-
         public bool IsValid { get; set; }
     }
 }

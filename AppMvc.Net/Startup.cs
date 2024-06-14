@@ -7,8 +7,6 @@ using AppMvc.Net.Data;
 using AppMvc.Net.Menu;
 using AppMvc.Net.Models;
 using AppMvc.Net.Services;
-using dotenv.net;
-
 
 
 //using App.Services;
@@ -25,6 +23,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using dotenv.net;
 
 namespace AppMvc.Net
 {

@@ -37,46 +37,46 @@ Database
             <i class="fas fa-cog"></i> Quản trị
         </a>
 
-        <div class="dropdown">
-            <a class="btn btn-outline-danger dropdown-toggle" href="#" id="managedropdownmenu">
-                <i class="fas fa-cog"></i> Manage
-            </a>
-            <div class="dropdown-menu">
-                <a class="dropdown-item" asp-action="Index" asp-controller="DbManage" asp-area="Database">
-                    Database
-                </a>
-                <a class="dropdown-item" asp-action="Index" asp-controller="Contact" asp-area="Contact">
-                    Contact Manage
-                </a>
-                <a class="dropdown-item" asp-action="Index" asp-controller="Role" asp-area="Identity">
-                    Role Management
-                </a>
-                <a class="dropdown-item" asp-action="Index" asp-controller="User" asp-area="Identity">
-                    Member Management
-                </a>
-                <a class="dropdown-item" asp-action="Index" asp-controller="Category" asp-area="Blog">
-                    Blod Management
-                </a>
-                <a class="dropdown-item" asp-action="Index" asp-controller="Post" asp-area="Blog">
-                    Post Management
-                </a>
-                <a target="_blank" class="dropdown-item" asp-action="Index" asp-controller="FileManager" asp-area="Files">
-                    Quản lý files
-                </a>
-                <a target="_blank" class="dropdown-item" asp-action="Index" asp-controller="CategoryProduct"
-                    asp-area="Product">
-                    Quản lý Category Product
-                </a>
-                <a target="_blank" class="dropdown-item" asp-action="Index" asp-controller="ProductManage"
-                    asp-area="Product">
-                    Quản lý Product
-                </a>
-                <a target="_blank" class="dropdown-item" asp-action="Index" asp-controller="DiscountsManage"
-                    asp-area="Discount">
-                    Quản lý Discount
-                </a>
-            </div>
-        </div>
+        @* <div class="dropdown">
+    <a class="btn btn-outline-danger dropdown-toggle" href="#" id="managedropdownmenu">
+    <i class="fas fa-cog"></i> Manage
+    </a>
+    <div class="dropdown-menu">
+    <a class="dropdown-item" asp-action="Index" asp-controller="DbManage" asp-area="Database">
+    Database
+    </a>
+    <a class="dropdown-item" asp-action="Index" asp-controller="Contact" asp-area="Contact">
+    Contact Manage
+    </a>
+    <a class="dropdown-item" asp-action="Index" asp-controller="Role" asp-area="Identity">
+    Role Management
+    </a>
+    <a class="dropdown-item" asp-action="Index" asp-controller="User" asp-area="Identity">
+    Member Management
+    </a>
+    <a class="dropdown-item" asp-action="Index" asp-controller="Category" asp-area="Blog">
+    Blod Management
+    </a>
+    <a class="dropdown-item" asp-action="Index" asp-controller="Post" asp-area="Blog">
+    Post Management
+    </a>
+    <a target="_blank" class="dropdown-item" asp-action="Index" asp-controller="FileManager" asp-area="Files">
+    Quản lý files
+    </a>
+    <a target="_blank" class="dropdown-item" asp-action="Index" asp-controller="CategoryProduct"
+    asp-area="Product">
+    Quản lý Category Product
+    </a>
+    <a target="_blank" class="dropdown-item" asp-action="Index" asp-controller="ProductManage"
+    asp-area="Product">
+    Quản lý Product
+    </a>
+    <a target="_blank" class="dropdown-item" asp-action="Index" asp-controller="DiscountsManage"
+    asp-area="Discount">
+    Quản lý Discount
+    </a>
+    </div>
+    </div> *@
 
         <script src="~/js/custom-dropmenu-dropdown.js" asp-append-version="true"></script>
     </body>

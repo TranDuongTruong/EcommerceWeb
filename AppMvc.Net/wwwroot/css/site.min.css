@@ -26,6 +26,10 @@ body {
   /* Vertically center the text there */
 }
 
+.container {
+  padding-top: 10px;
+}
+
 .app-navbar {
   background: rgba(0, 0, 0, 0.8);
 }
@@ -242,4 +246,63 @@ body {
 
 .quantity-display {
   margin: 0 10px;
+}
+
+#mainNav {
+  background-color: #212529;
+  /* Dark background */
+  padding: 0.5rem 1rem;
+  /* Reduced padding for smaller height */
+}
+
+.navbar-brand {
+  color: #FFC300 !important;
+  /* Yellow color for brand */
+  font-weight: bold;
+}
+
+.navbar-nav .nav-link {
+  color: #ffffff !important;
+  /* White color for nav links */
+}
+
+.navbar-nav .nav-link:hover {
+  color: #FFC300 !important;
+  /* Yellow color on hover */
+}
+
+.nav-link:hover {
+  color: #FFC300 !important;
+  /* Yellow color on hover */
+}
+
+.navbar-toggler {
+  border-color: #FFC300;
+  /* Yellow border for toggle button */
+}
+
+.navbar-toggler .fas {
+  color: #FFC300;
+  /* Yellow color for the toggle icon */
+}
+
+.navbar-nav {
+  flex-direction: row;
+  /* Align items in a row */
+}
+
+.navbar-nav .nav-item {
+  margin-left: 15px;
+  /* Space between nav items */
+}
+
+.d-flex.align-items-center .ms-3 {
+  margin-left: 15px;
+  /* Space between the login/cart partials */
+}
+
+.navbar-nav.mx-auto {
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }

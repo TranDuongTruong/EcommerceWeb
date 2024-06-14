@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Payment.Application.Interface
 {
-    internal interface IConnectionService
+    public interface IConnectionService
     {
         string? Datebase { get; }
 

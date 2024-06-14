@@ -20,6 +20,7 @@ namespace AppMvc.Net
             Host.CreateDefaultBuilder(args)
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
+                    //  webBuilder.UseUrls("http://0.0.0.0:8090", "https://0.0.0.0:8091");
                     webBuilder.UseStartup<Startup>();
                 });
     }
